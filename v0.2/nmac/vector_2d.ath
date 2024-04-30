@@ -1,10 +1,12 @@
 load "real"
 load "types"
-
+# @moduledoc
+#  This module defines the operations on 2D vectors.
 module Vector_2d{
 
   declare 0_vec: Vector_2d
 
+  # The directive assert is used to insert a sentence into the current assumption base
   assert 0_vec_definition := (0_vec = (vec_2d 0.0 0.0)) 
 
   define [ux uy vx vy r] := [?ux:Real ?uy:Real ?vx:Real ?vy:Real ?r:Real]
@@ -12,88 +14,83 @@ module Vector_2d{
   define [u v] := [?u:Vector_2d ?v:Vector_2d]
 
 #****************************************************************************
- declare getx: [Vector_2d] -> Real
-
- assert* getx-axiom := 
+  # Function that returns the x-coordinate of a 2D vector
+  declare getx: [Vector_2d] -> Real
+  # Actual definition of the function
+  assert* getx-axiom := 
   ((getx (vec_2d ux uy)) = ux)
 
 #----------------------------------------------------------------------------
 
 #****************************************************************************
- declare gety: [Vector_2d] -> Real
- 
+  # Function that returns the y-coordinate of a 2D vector
+  declare gety: [Vector_2d] -> Real
+  # Actual definition of the function
   assert* gety-axiom := 
   ((gety (vec_2d ux uy)) = uy)
 #----------------------------------------------------------------------------
    
-#Required Operations :- vect_add, vect_norm, dot_product
 #****************************************************************************
 
-#---- ADDITION
+  #---- ADDITION
+  # Function that adds two 2D vectors by adding their corresponding x and y coordinates
+  # and returns the resulting vector
   declare ADD: [Vector_2d Vector_2d] -> Vector_2d [+]
 
+  # Actual definition of the function
   module ADD{
-
-    assert* ADD_axiom := ((ADD (vec_2d ux uy) (vec_2d vx vy)) = (vec_2d (ux + vx) (uy + vy)))
-
+    assert* ADD_axiom :=
+    (
+      (ADD (vec_2d ux uy) (vec_2d vx vy)) = (vec_2d (ux + vx) (uy + vy))
+    )
     assert* ADD_0 :=  ((ADD u 0_vec) = u)  
-
+    # assert* ADD_0* :=  ((ADD 0_vec u) = u)  
   }#ADD
 #----------------------------------------------------------------------------
 
 #****************************************************************************
 
-#-- vector subtraction
+  #-- vector subtraction
+  # Function that subtracts two 2D vectors by subtracting their corresponding x and y
+  # coordinates and returns the resulting vector
   declare SUBTRACT: [Vector_2d Vector_2d] -> Vector_2d [-]
 
+  # Actual definition of the function
   module SUBTRACT{
-
     assert* SUBTRACT_axiom := ((SUBTRACT (vec_2d ux uy) (vec_2d vx vy)) = (vec_2d (ux - vx) (uy - vy)))
-
     assert* SUBTRACT_0 :=  ((SUBTRACT u 0_vec) = u)  
-
   }#SUBTRACT
 #----------------------------------------------------------------------------
 
 #****************************************************************************
 
-#-- vector product with a scalar
+  # Function that multiplies a 2D vector by a scalar multiplication
   declare SCALAR-MULT: [Vector_2d Real]-> Vector_2d [*]
 
+  # Actual definition of the function
   module SCALAR-MULT{
-      
       assert* SCALAR-MULT_axiom := ((SCALAR-MULT (vec_2d ux uy) r) = (vec_2d (* ux r) (* uy r)))
-
       assert* SCALAR-MULT_0 :=  ((SCALAR-MULT u 0.0) = 0_vec)
-
-  
-}#scalar-mult
+  }#scalar-mult
 #----------------------------------------------------------------------------
 
 #****************************************************************************
-
-#---- SCALAR PRODUCT OR DOT PRODUCT
+  # Function that returns the dot product of two 2D vectors
   declare DOT: [Vector_2d Vector_2d] -> Real [dot]
-
+  # Actual definition of the function
   module DOT{
-
     assert* DOT_axiom := ((DOT (vec_2d ux uy) (vec_2d vx vy)) = (+ (* ux vx) (* uy vy)))
-
     assert* DOT_0 :=  ((DOT u 0_vec) = 0.0)  
-
   }#DOT
 #----------------------------------------------------------------------------
 
 #****************************************************************************
 
-#---- EUCLIDEAN NORM
-
+  #---- EUCLIDEAN NORM
+  # Function that returns the Euclidean norm of a 2D vector
   declare NORM: [Vector_2d] -> Real [norm]
-
   module NORM{
-
     assert* NORM_axiom := ((NORM (vec_2d ux uy)) = (Real.sqrt (+ (* ux ux) (* uy uy))))
-
   }#NORM
 #----------------------------------------------------------------------------
 

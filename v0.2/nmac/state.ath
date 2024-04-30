@@ -17,6 +17,11 @@ module State{
 	declare set-vxy: [State Vector_2d] -> State
 
 	assert* set-vxy-axiom :=
+	# TODO: here there is an error notice that state receives 6 arguments but none of them
+	# are Vector_2d, all of them are Real!
+	# Error: Unable to infer a sort for the term:
+	# (state ?sa:Vector_2d ?saz:Real ?va:Vector_2d ?vaz:Real ?ta:Real)
+	# (Failed to unify the sorts Vector_2d and Real.).
 	let{ state_i := (state sa saz va vaz ta);
 	     new_state := (state sa saz v vaz ta)}
 	( (set-vxy state_i v) = new_state) 
