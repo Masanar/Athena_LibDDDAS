@@ -1,9 +1,6 @@
+# This is a module that extends the Real module with the sin, cos and sqrt functions
 extend module Real{
-	
 	declare sqrt: [Real] -> Real
-
 	declare sin: [Real] -> Real
-
 	declare cos: [Real] -> Real 
-
 }
