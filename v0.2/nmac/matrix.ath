@@ -3,60 +3,64 @@ load "lib/main/nat-minus"
 load "lib/main/nat-less"
 load "vector_2d"
 load "types"
-
+# QUESTION: Why the definition of the datatype is not in the module?
+# A row is a 'list' of N's or the empty row (nilr)
+# I guess that N is Nat
 datatype Row := nilr | (consr N Row)
-
+# A matrix is a 'list' of rows or the empty matrix (nilM)
 datatype Matrix := nilM | (consM Row Matrix)
 
+# @moduledoc
+# This module define the matrix data type as 'colection' of rows, and several functions
+# to manipulate the matrix. The functions are:
+#   - set: sets a value in a row and column
+#   - delete: deletes a value from a row and column
+#   - unassigned: finds the index of the first unassigned row
+# and the predicates:
+#   - complete: checks if all rows have an assigned column
+#   - assigned: checks if a row has exactly one assigned column
+#   - in-Matrix: checks if a row is in a matrix
 module Matrix{
 
-#****************************************************************************
-	#-- function that sets at row i anc column j
-	declare set: [Matrix N N] -> Matrix
+  #****************************************************************************
+  #-- function that sets at row i anc column j
+  declare set: [Matrix N N] -> Matrix
+  #--function that deletes from row i and column j
+  declare delete: [Matrix N N] -> Matrix    
+  #--function that checks if all rows have an assigned column
+  declare complete: [Matrix] -> Boolean
+  #--function that checks if a row has exactly one assigned column
+  declare assigned: [Row] -> Boolean    
+  #--function that finds the index of the first unassigned row
+  declare unassigned: [Matrix] -> N
+  # Variables that are going to be used in the axioms
+  define [M M_tail row]:= [?M:Matrix ?M_tail:Matrix ?row:Row]
 
-    #--function that deletes from row i and column j
-    declare delete: [Matrix N N] -> Matrix    
+  #---------------------------------------------------------------------------
 
-    #--function that checks if all rows have an assigned column
-    declare complete: [Matrix] -> Boolean
-
-    #--function that checks if a row has exactly one assigned column
-    declare assigned: [Row] -> Boolean    
-
-    #--function that finds the index of the first unassigned row
-    declare unassigned: [Matrix] -> N
-
-    define [M M_tail row]:= [?M:Matrix ?M_tail:Matrix ?row:Row]
-
-#---------------------------------------------------------------------------
-#****************************************************************************
+  #****************************************************************************
   #-- membership operator in-Matrix
-
+  # Function that checks if a row is in a matrix
   declare in-Matrix : (Row) [Row Matrix]-> Boolean
-  
   assert* empty-Matrix :=
-          (~ (in-Matrix ?r:Row nilM))
-  
+    (~ (in-Matrix ?r:Row nilM))
   assert* nonempty-Matrix :=
-          ((in-Matrix ?r:Row (consM ?h:Row ?tail:Matrix)) <==> 
-          ?r:Row = ?h:Row | (in-Matrix ?r:Row ?tail:Matrix) )
+    ((in-Matrix ?r:Row (consM ?h:Row ?tail:Matrix)) <==> 
+    ?r:Row = ?h:Row | (in-Matrix ?r:Row ?tail:Matrix) )
 
-#****************************************************************************
-#****************************************************************************
+  #---------------------------------------------------------------------------
+
+  #****************************************************************************
   assert complete-axioms :=
   (fun
-  [
-   (complete M) =
+    [
+    (complete M) =
       [
-       true  when (forall row . ((in-Matrix row M) & (assigned row)) )
-       false when (~(forall row . ((in-Matrix row M) & (assigned row)) ))
+      true  when (forall row . ((in-Matrix row M) & (assigned row)) )
+      false when (~(forall row . ((in-Matrix row M) & (assigned row)) ))
       ]
-  ])
-
+    ]
+  )
   define [complete-true complete-false] := complete-axioms
-
-#--------------------------------------------------------------------------
-
-
-
+  #--------------------------------------------------------------------------
 }#module Matrix

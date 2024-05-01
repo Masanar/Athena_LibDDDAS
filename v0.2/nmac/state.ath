@@ -5,7 +5,8 @@ load "vector_2d"
 load "types"
 
 #datatype State := (state sxy:Vector_2d sz:Real vxy:Vector_2d vz:Real t:Real)
-
+# @moduledoc
+# This module difenes functions over the State datatype
 module State{
 #****************************************************************************
 	define [sa va saz vaz ta v]:= [?sa:Vector_2d ?va:Vector_2d ?saz:Real ?vaz:Real ?ta:Real ?v:Vector_2d]

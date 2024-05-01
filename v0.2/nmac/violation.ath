@@ -6,138 +6,166 @@ load "v-list"
 load "matrix"
 load "nmac"
 load "real"
+# Near Mid Air Collision
+# @moduledoc
+# This module extends the NMAC module with the function:
+#   -get-cofing: Is a function that takes a flightplan and a time and returns the
+#                configuration of the aircraft at that time
+# and the predicates:
+#   -exists-violation: Is a function that takes two flightplans and two times and  detects
+#                      if there is a violation between the two aircrafts at H and D
+#   -T-violation: Is a function that takes a list of times, two flightplans and detects
+#                 H and D violations between each consecutive pair of times
 
 extend-module NMAC{
 
-#****************************************************************************
-#---------------------------------------------------------------------------
-
-
-#****************************************************************************
-  #-- a function that takes a flightplan fa and a time and 
-  #-- returns the configuration of the aircraft at that time 
-
+  #****************************************************************************
+  # function that takes a flightplan fa and a time and 
+  # returns the configuration of the aircraft at that time 
   declare get-config: [Flightplan Real] -> Configuration
 
-  #-- for empty flightplan
+  # get-config of a nil flightplan at any time is the 'initial' configuration
   assert* get-config-axiom1 :=
   ((get-config nilF time) = (config 0.0 0.0 0.0 0.0 0.0 0.0 0.0) )
 
-  #-- for unary flightplan
+  # get-config of a  flightplan with just one configuration
+  # in the case that ta <= time
   assert* get-config-axiom2 :=
-  let{
-      sa := (vec_2d sxa sya);
+    let{
+      sa  := (vec_2d sxa sya);
       vxa := (vga * (Real.cos ha));
       vya := (vga * (Real.sin ha));
-      va := (vec_2d vxa vya);
-      sa_time := (Vector_2d.+ sa (Vector_2d.* va (time - ta) )); 
+      va  := (vec_2d vxa vya);
+      sa_time  := (Vector_2d.+ sa (Vector_2d.* va (time - ta) )); 
       sza_time := (sza + (vza * (time - ta) )); 
-      new_config := (config (Vector_2d.getx sa_time) (Vector_2d.gety sa_time) sza_time vga ha vza time)
-     }
-  ( (ta <= time ) ==> (get-config (consF (config sxa sya sza vga ha vza ta) nilF) time) = new_config)
-  
-  #-- for unary flightplan
+      new_config := 
+        (config (Vector_2d.getx sa_time) (Vector_2d.gety sa_time) sza_time vga ha vza time)
+    }
+    ( 
+      (ta <= time ) 
+      ==> 
+      (get-config (consF (config sxa sya sza vga ha vza ta) nilF) time) = new_config
+    )
+
+  # get-config of a  flightplan with just one configuration
+  # in the case that ta > time, this means that there is no configuration at time 
   assert* get-config-axiom3 :=
   let{
-      sa := (vec_2d sxa sya);
-      vxa := (vga * (Real.cos ha));
-      vya := (vga * (Real.sin ha));
-      va := (vec_2d vxa vya);
-      sa_time := (Vector_2d.+ sa (Vector_2d.* va (time - ta) )); 
-      sza_time := (sza + (vza * (time - ta) )); 
-      new_config := (config (Vector_2d.getx sa_time) (Vector_2d.gety sa_time) sza_time vga ha vza time)
-     }
-  ( ~(ta <= time ) ==> (get-config (consF (config sxa sya sza vga ha vza ta) nilF) time) = (config 0.0 0.0 0.0 0.0 0.0 0.0 0.0))
+    sa := (vec_2d sxa sya);
+    vxa := (vga * (Real.cos ha));
+    vya := (vga * (Real.sin ha));
+    va := (vec_2d vxa vya);
+    sa_time := (Vector_2d.+ sa (Vector_2d.* va (time - ta) )); 
+    sza_time := (sza + (vza * (time - ta) )); 
+    new_config :=
+     (config (Vector_2d.getx sa_time) (Vector_2d.gety sa_time) sza_time vga ha vza time)
+  }
+  ( 
+    ~(ta <= time ) 
+    ==> 
+    (get-config (consF (config sxa sya sza vga ha vza ta) nilF) time) 
+      = (config 0.0 0.0 0.0 0.0 0.0 0.0 0.0)
+  )
 
-#!!! The below lines make the code slow and take forever
-
-  #-- for normal flightplan
-#  assert* get-config-axiom4 :=
-#  let{ 
-#      config_i := (config sxa sya sza vga ha vza ta);
-#      config_i+1 := (config sxa2 sya2 sza2 vga2 ha2 vza2 ta2); 
-#      tail_plan := (consF config_i+1 fp);
-#      plan := (consF config_i tail_plan);
-#      sa := (vec_2d sxa sya);
-#      vxa := (vga * (Real.cos ha));
-#      vya := (vga * (Real.sin ha));
-#      va := (vec_2d vxa vya);
-#      sa_time := (Vector_2d.+ sa (Vector_2d.* va (time - ta) )); 
-#      sza_time := (sza + (vza * (time - ta) )); 
-#      new_config := (config (Vector_2d.getx sa_time) (Vector_2d.gety sa_time) sza_time vga ha vza time)
- #     }    
- # (
- # (ta <= time & time < ta2) ==> 
- # ((get-config plan time) = new_config) 
- # )
-
+  #!!! The below lines make the code slow and take forever
 
   #-- for normal flightplan
-#  assert* get-config-axiom5 :=
-#  let{ 
-#      config_i := (config sxa sya sza vga ha vza ta);
-#      config_i+1 := (config sxa2 sya2 sza2 vga2 ha2 vza2 ta2); 
-#      tail_plan := (consF config_i+1 fp);
-#      plan := (consF config_i tail_plan);
-#      sa := (vec_2d sxa sya);
-#      vxa := (vga * (Real.cos ha));
-#      vya := (vga * (Real.sin ha));
-#      va := (vec_2d vxa vya);
-#      sa_time := (Vector_2d.+ sa (Vector_2d.* va (time - ta) )); 
-#      sza_time := (sza + (vza * (time - ta) )); 
-#      new_config := (config (Vector_2d.getx sa_time) (Vector_2d.gety sa_time) sza_time vga ha vza time)
-#      }    
-#  (
-# ~ (ta <= time & time < ta2) ==> 
-#  ((get-config plan time) = (get-config tail_plan time) ) 
-# )
+  #  assert* get-config-axiom4 :=
+  #  let{ 
+  #      config_i := (config sxa sya sza vga ha vza ta);
+  #      config_i+1 := (config sxa2 sya2 sza2 vga2 ha2 vza2 ta2); 
+  #      tail_plan := (consF config_i+1 fp);
+  #      plan := (consF config_i tail_plan);
+  #      sa := (vec_2d sxa sya);
+  #      vxa := (vga * (Real.cos ha));
+  #      vya := (vga * (Real.sin ha));
+  #      va := (vec_2d vxa vya);
+  #      sa_time := (Vector_2d.+ sa (Vector_2d.* va (time - ta) )); 
+  #      sza_time := (sza + (vza * (time - ta) )); 
+  #      new_config := (config (Vector_2d.getx sa_time) (Vector_2d.gety sa_time) sza_time vga ha vza time)
+  #     }    
+  # (
+  # (ta <= time & time < ta2) ==> 
+  # ((get-config plan time) = new_config) 
+  # )
 
 
   #-- for normal flightplan
+  #  assert* get-config-axiom5 :=
+  #  let{ 
+  #      config_i := (config sxa sya sza vga ha vza ta);
+  #      config_i+1 := (config sxa2 sya2 sza2 vga2 ha2 vza2 ta2); 
+  #      tail_plan := (consF config_i+1 fp);
+  #      plan := (consF config_i tail_plan);
+  #      sa := (vec_2d sxa sya);
+  #      vxa := (vga * (Real.cos ha));
+  #      vya := (vga * (Real.sin ha));
+  #      va := (vec_2d vxa vya);
+  #      sa_time := (Vector_2d.+ sa (Vector_2d.* va (time - ta) )); 
+  #      sza_time := (sza + (vza * (time - ta) )); 
+  #      new_config := (config (Vector_2d.getx sa_time) (Vector_2d.gety sa_time) sza_time vga ha vza time)
+  #      }    
+  #  (
+  # ~ (ta <= time & time < ta2) ==> 
+  #  ((get-config plan time) = (get-config tail_plan time) ) 
+  # )
+
+
+  # get-config of a flightplan with n configurations (n > 1) 
+  # when the time is between the time of the first configuration and the time of the second
+  # configuration
+
   assert* get-config-axiom4 :=
   let{ 
-      tail_plan := (consF config_i+1 fp);
-      plan := (consF config_i tail_plan);
-      sxa := (Configuration.getsx config_i);
-      sya := (Configuration.getsy config_i);
-      vga := (Configuration.getvg config_i);
-      ha := (Configuration.geth config_i);
-      ta := (Configuration.gettime config_i);
-      sa := (vec_2d sxa sya);
-      vxa := (vga * (Real.cos ha));
-      vya := (vga * (Real.sin ha));
-      va := (vec_2d vxa vya);
-      sa_time := (Vector_2d.+ sa (Vector_2d.* va (time - ta) )); 
-      sza_time := (sza + (vza * (time - ta) )); 
-      new_config := (config (Vector_2d.getx sa_time) (Vector_2d.gety sa_time) sza_time vga ha vza time)
-      }    
+    tail_plan := (consF config_i+1 fp);
+    plan := (consF config_i tail_plan);
+    sxa := (Configuration.getsx config_i);
+    sya := (Configuration.getsy config_i);
+    vga := (Configuration.getvg config_i);
+    ha := (Configuration.geth config_i);
+    ta := (Configuration.gettime config_i);
+    sa := (vec_2d sxa sya);
+    vxa := (vga * (Real.cos ha));
+    vya := (vga * (Real.sin ha));
+    va := (vec_2d vxa vya);
+    sa_time := (Vector_2d.+ sa (Vector_2d.* va (time - ta) )); 
+    sza_time := (sza + (vza * (time - ta) )); 
+    new_config := 
+      (config (Vector_2d.getx sa_time) (Vector_2d.gety sa_time) sza_time vga ha vza time)
+  }    
   (
-  (ta <= time & time < ta2) ==> 
-  ((get-config plan time) = new_config) 
+    (ta <= time & time < ta2) 
+    ==> 
+    ((get-config plan time) = new_config) 
   )
 
 
   #-- for normal flightplan
+  # QUESTION: Is this axiom necessary? It is wrong? notice that the condition:
+  # (ta <= time & time < ta2) is the same as the get-config-axiom4, doesn't it?
+  # But I think that, that is not the case, this should be the 'recursion' definition
+  # I think that this is related to the comments on the other possible definitios that 
+  # take too much time to execute
   assert* get-config-axiom5 :=
   let{ 
-      tail_plan := (consF config_i+1 fp);
-      plan := (consF config_i tail_plan);
-      ta := (Configuration.gettime config_i);
-      ta2 := (Configuration.gettime config_i+1)
-      }    
+    tail_plan := (consF config_i+1 fp);
+    plan := (consF config_i tail_plan);
+    ta := (Configuration.gettime config_i);
+    ta2 := (Configuration.gettime config_i+1)
+  }    
   (
-  (ta <= time & time < ta2) ==> 
-  ((get-config plan time) = (get-config tail_plan time) ) 
+    (ta <= time & time < ta2) ==> 
+    ((get-config plan time) = (get-config tail_plan time) ) 
   )
 
-#----------------------------------------------------------------------------
+  #----------------------------------------------------------------------------
 
-#****************************************************************************
+  #****************************************************************************
   #-- takes two times, two flightplans and detects H and D violations
-  
+
   declare exists-violation: [Real Real Flightplan Flightplan Real Real] -> Boolean
   assert exists-violation-axioms :=
-  let{ 
+    let{ 
       config_A_t := (get-config fa t);
       config_B_t := (get-config fb t);
       vgAt := (Configuration.getvg config_A_t);
@@ -159,45 +187,46 @@ extend-module NMAC{
       sxy_time := (Vector_2d.+ sxyt (Vector_2d.* vxyt (time - t)) );
       sz_time := (szt + ((time - t) * vzt));
       horiz_sep := (Vector_2d.NORM sxy_time);
-      vert_sep := sz_time
-      }
-  (fun
-  [
-   (exists-violation t t2 fa fb D H) =
+      vert_sep := sz_time;
+      violation-predicate := ((t < time & time <= t2) & (horiz_sep < D) & (vert_sep < H))
+    }
+    (fun
+    [
+      (exists-violation t t2 fa fb D H) =
       [
-       true  when (exists time . (t < time & time <= t2) & (horiz_sep < D) & (vert_sep < H))
-       false when (~ (exists time . (t < time & time <= t2) & (horiz_sep < D) & (vert_sep < H)))       
+        true  when (exists time . violation-predicate)
+        false when (~(exists time . violation-predicate))       
       ]
-  ])
-  
-    define [exists-violation-true exists-violation-false] := exists-violation-axioms
+    ])
 
-#----------------------------------------------------------------------------
+  define [exists-violation-true exists-violation-false] := exists-violation-axioms
 
-#****************************************************************************
+  #----------------------------------------------------------------------------
+
+  #****************************************************************************
   #-- takes a lis of times, two flightplans and detects H and D violations
   #-- between each consecutive pair of times
-  
+
   declare T-violation: [Time-list Flightplan Flightplan Real Real] -> Boolean
 
 
   assert T-violation-axioms :=
   let{ 
-       T2 := (consTl t2 t_list);
-       T := (consTl t T2)
-       }
+    T2 := (consTl t2 t_list);
+    T := (consTl t T2)
+  }
   (fun
   [
-   (T-violation nilTl fa fb D H) = false
-   (T-violation T fa fb D H) =
+    (T-violation nilTl fa fb D H) = false
+    (T-violation T fa fb D H) =
       [
-       true  when (exists-violation t t2 fa fb D H)
-       (T-violation T2 fa fb D H) when (~ (exists-violation t t2 fa fb D H))
+        true  when (exists-violation t t2 fa fb D H)
+        (T-violation T2 fa fb D H) when (~ (exists-violation t t2 fa fb D H))
       ]
   ])
 
   define [T-violation-empty T-violation-true T-violation-next] := T-violation-axioms
 
-#----------------------------------------------------------------------------
+  #----------------------------------------------------------------------------
 
 }#extend-module NMAC

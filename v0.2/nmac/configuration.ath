@@ -5,7 +5,8 @@ load "vector_2d"
 load "types"
 
 
-
+# @moduledoc
+# This module defines the Configuration getters for its attributes
 module Configuration{
 #****************************************************************************
 	define [sxa sya sza vga ha vza t]:=
