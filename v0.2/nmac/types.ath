@@ -18,6 +18,7 @@ assert* (datatype-axioms "Vector_2d")
 # vg: R >= 0 is the ground speed of the aircraft
 # h: [0,2pi) is the course or actual direction of motion
 # vz: R is the vertical speed of the aircraft
+# t: is the time at which the configuration is 'recorded'
 datatype Configuration := (config sx:Real sy:Real sz:Real vg:Real h:Real vz:Real t:Real)
 
 #!!! The below line makes the code slow and take forever
