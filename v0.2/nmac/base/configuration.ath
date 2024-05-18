@@ -8,11 +8,11 @@ load "types"
 # @moduledoc
 # This module defines the Configuration getters for its attributes
 module Configuration{
-#****************************************************************************
+	#****************************************************************************
 	define [sxa sya sza vga ha vza t]:=
 	[?sxa:Real ?sya:Real ?sza:Real ?vga:Real ?ha:Real ?vza:Real ?t:Real]
 
-#****************************************************************************
+	#****************************************************************************
 	# Definition of getters fot Configuration datatype
 
 	declare getsx: [Configuration] -> Real

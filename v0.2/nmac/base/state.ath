@@ -8,10 +8,10 @@ load "types"
 # @moduledoc
 # This module difenes functions over the State datatype
 module State{
-#****************************************************************************
+	#****************************************************************************
 	define [sa va saz vaz ta v]:= [?sa:Vector_2d ?va:Vector_2d ?saz:Real ?vaz:Real ?ta:Real ?v:Vector_2d]
 
-#****************************************************************************
+	#****************************************************************************
 	#-- function that takes a State i and a Vector_2d v 
 	#-- and returns a new state i such that i.vxy = v
 

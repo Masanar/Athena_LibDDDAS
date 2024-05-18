@@ -1,12 +1,12 @@
 load "lib/main/nat-plus"
 load "lib/main/nat-minus"
 load "lib/main/nat-less"
-load "vector_2d"
-load "types"
+load "base/vector_2d"
+load "base/types"
 load "violation"
-load "flightplan"
-load "matrix"
-load "nmac"
+load "base/flightplan"
+load "base/matrix"
+load "base/nmac"
 load "algorithm"
 
 extend-module NMAC{

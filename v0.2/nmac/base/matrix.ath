@@ -3,6 +3,7 @@ load "lib/main/nat-minus"
 load "lib/main/nat-less"
 load "vector_2d"
 load "types"
+
 # QUESTION: Why the definition of the datatype is not in the module?
 # A row is a 'list' of N's or the empty row (nilr)
 # I guess that N is Nat

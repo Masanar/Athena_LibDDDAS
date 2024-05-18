@@ -1,11 +1,11 @@
 load "lib/main/nat-plus"
 load "lib/main/nat-minus"
 load "lib/main/nat-less"
-load "types"
-load "v-list"
-load "matrix"
-load "nmac"
-load "real"
+load "base/types"
+load "base/v-list"
+load "base/matrix"
+load "base/nmac"
+load "base/real"
 load "violation"
 
 # @moduledoc

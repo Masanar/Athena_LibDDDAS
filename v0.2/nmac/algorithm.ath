@@ -1,12 +1,12 @@
 load "lib/main/nat-plus"
 load "lib/main/nat-minus"
 load "lib/main/nat-less"
-load "vector_2d"
-load "types"
+load "base/vector_2d"
+load "base/types"
 load "flightplan"
-load "matrix"
-load "v-list"
-load "nmac"
+load "base/matrix"
+load "base/v-list"
+load "base/nmac"
 
 # @moduledoc
 # This module extends the NMAC principally with the solve function whichis used to solve
