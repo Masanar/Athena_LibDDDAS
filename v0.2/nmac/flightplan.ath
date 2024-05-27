@@ -120,7 +120,7 @@ extend-module NMAC{
   #----------------------------------------------------------------------------
 
   #****************************************************************************
-  #-- safe returns true if there exists no collisio  between 
+  #-- safe returns true if there exists no collision  between 
   #-- any two flight-plans in the given set of flight-plans
 
   declare safe: [Fplan-list Real Real] -> Boolean

@@ -1,3 +1,69 @@
 load "lib/main/nat-plus"
 load "lib/main/nat-minus"
 load "lib/main/nat-less"
+
+#****************************************************************************
+#-- 2D vectors 
+datatype Vector_2d 
+         := (vec_2d x:Real y:Real)
+
+#  The datatype-axioms command generates the free-generation axioms for the datatype Vector_2d. 
+#   - (a) different constructor applications create different elements of D;  
+#   -(b) every element of D is represented by some constructor application
+assert* (datatype-axioms "Vector_2d")
+
+
+#****************************************************************************
+#-- configuration of an aircraft at time t, is a vector where:
+# sx,sy,sz : R3 are the coordinates of the aircraft
+# vg: R >= 0 is the ground speed of the aircraft
+# h: [0,2pi) is the course or actual direction of motion
+# vz: R is the vertical speed of the aircraft
+# t: is the time at which the configuration is 'recorded'
+datatype Configuration 
+         := (config sx:Real sy:Real sz:Real vg:Real h:Real vz:Real t:Real)
+
+#!!! The below line makes the code slow and take forever
+# assert* (datatype-axioms "Configuration")
+
+#****************************************************************************
+#-- state of an aircraft is a vector where:
+# sx,sy,sz are the coordinates of the aircraft
+# vx,vy,vz are the components fo the velocity vector in the x,y,z dimensions
+datatype State 
+         := (state sx:Real sy:Real sz:Real vx:Real vy:Real vz:Real)
+
+#!!! The below line makes the code slow and take forever
+# assert* (datatype-axioms "State")
+
+#****************************************************************************
+#-- collection of states of an aircraft
+# I think that a flight-plan is a list of way-points or the segments corresponding  
+# to the flight plan based on such way-points
+datatype Flightplan 
+         := nilF | (consF Configuration Flightplan)
+
+assert* (datatype-axioms "Flightplan")
+
+#****************************************************************************
+#-- List of flightplans
+datatype Fplan-list 
+         := nilP | (consP Flightplan Fplan-list)
+
+assert* (datatype-axioms "Fplan-list")
+
+
+#****************************************************************************
+#-- list of ground speed
+datatype V-list 
+         := nilV | (consV Real V-list)
+
+assert* (datatype-axioms "V-list")
+
+#****************************************************************************
+#-- a list of times 
+datatype Time-list 
+         := nilTl | (consTl Real Time-list)
+
+assert* (datatype-axioms "Time-list")  
+  

@@ -1,0 +1,19 @@
+
+module UAVVF{
+    declare solve: [Flightplan Configuration Flightplan] -> [Configuration]
+    assert solve-axioms := 
+    (fun
+        [(solve c1 c2 fp) =
+            [
+            #  add the linear configuration to the flightplan and recursively call solve
+            #  to add the circular information to the flightplan
+               when CircularMotionFirst 
+
+            # return the adjusted (x,y,z) position same angle, velocities and time  
+            # singleton Flightplan
+              when LinearMotion
+            ]
+        ] 
+    )
+
+}

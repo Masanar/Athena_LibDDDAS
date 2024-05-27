@@ -1,0 +1,61 @@
+load "real"
+load "state"
+load "configuration"
+
+module Position{
+    define 
+    [lwa rwa ha nr haf has alpha t Rfs sx sy sz vx vy vz sxi syi szi vxi vyi vzi ] := 
+        [
+            ?lwa: Real ?rwa: Real ?ha: Real ?nr: Real ?haf: Real ?has: Real 
+            ?alpha: Real ?t: Real ?Rfs: Real
+            ?sx: Real ?sy: Real ?sz: Real ?vx: Real ?vy: Real ?vz: Real 
+            ?sxi: Real ?syi: Real ?szi: Real ?vxi: Real ?vyi: Real ?vzi: Real
+        ]
+
+    define [cfg_i cfg_i+1] := [?cfg_i: Configuration ?cfg_i+1: Configuration]
+
+    define [state_l state_f] := [?state_l: State ?state_f: State]
+
+    declare position-left-follower: [State Real Real Real] -> State 
+
+    declare position-right-follower: [State Real Real Real] -> State 
+
+
+    assert position-follower-definition :=
+        let{
+            cos_left := (Real.cos lwa + ha);
+            sin_left := (Real.sin lwa + ha);
+            cos_right := (Real.cos rwa + ha);
+            sin_right := (Real.sin rwa + ha)
+            # st_x := (State.getsx st);
+        }
+        (fun
+            [
+                (position-left-follower (state sx sy sz vx vy vz) lwa ha nr) =
+                    (state (sx + nr * cos_left) (sy + nr * sin_left) sz 0 0 0)
+                (position-right-follower (state sx sy sz vx vy vz) rwa ha nr) =
+                    (state (sx + nr * cos_right) (sy + nr * sin_right) sz 0 0 0)
+            ]
+        )
+
+    declare angle-motion : [Real Real] -> Real
+    assert angle-motion-definition := ((angle-motion haf has) = (haf - has))
+
+    declare common-center : [State State] -> State
+    assert common-center-definition := 
+        let{
+           ccx := ((sx + sxi) / 2); 
+           ccy := ((sy + syi) / 2)
+        }
+        (fun
+            [
+                (common-center (state sx sy sz vx vy vz) (state sxi syi szi vxi vyi vzi)) =
+                (state ccx ccy sz 0 0 0)
+            ]
+        )
+
+    declare follower-velocity : [Real Real Real] -> Real
+    assert follower-velocity-definition := 
+        ((follower-velocity Rfs alpha t) = (Rfs * alpha / t))
+
+}

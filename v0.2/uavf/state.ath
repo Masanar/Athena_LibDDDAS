@@ -1,0 +1,57 @@
+load "lib/main/nat-plus"
+load "lib/main/nat-minus"
+load "lib/main/nat-less"
+load "vector_2d"
+load "types"
+
+#datatype State := (state sxy:Vector_2d sz:Real vxy:Vector_2d vz:Real t:Real)
+# @moduledoc
+# This module difenes functions over the State datatype
+module State{
+	#****************************************************************************
+	# define [sa va saz vaz ta v]:= [?sa:Vector_2d ?va:Vector_2d ?saz:Real ?vaz:Real ?ta:Real ?v:Vector_2d]
+	#****************************************************************************
+	#-- function that takes a State i and a Vector_2d v 
+	#-- and returns a new state i such that i.vxy = v
+	# declare set-vxy: [State Vector_2d] -> State
+	# assert* set-vxy-axiom :=
+	# TODO: here there is an error notice that state receives 6 arguments but none of them
+	# are Vector_2d, all of them are Real!
+	# Error: Unable to infer a sort for the term:
+	# (state ?sa:Vector_2d ?saz:Real ?va:Vector_2d ?vaz:Real ?ta:Real)
+	# (Failed to unify the sorts Vector_2d and Real.).
+	# let{ state_i := (state sa saz va vaz ta);
+	#      new_state := (state sa saz v vaz ta)}
+	# ( (set-vxy state_i v) = new_state) 
+	define [sx sy sz vx vy vz t st vg h t] := 
+		   [?sx:Real ?sy:Real ?sz:Real 
+		   ?vx:Real ?vy:Real ?vz:Real 
+		   ?t:Real ?st:State ?vg:Real ?h:Real ?t:Real]
+
+	declare getsx : [State] -> Real
+	assert* getsx-axion := ( (getsx (state sx sy sz vx vy vz)) = sx)
+
+	declare getsy : [State] -> Real
+	assert* getsy-axion := ( (getsy (state sx sy sz vx vy vz)) = sy)
+
+	declare getsz : [State] -> Real
+	assert* getsz-axion := ( (getsz (state sx sy sz vx vy vz)) = sz)	
+
+	declare getvz : [State] -> Real
+	assert* getvz-axion := ( (getvz (state sx sy sz vx vy vz)) = vz)
+
+	declare state-to-configuration : [State Real Real Real] -> Configuration
+	assert state-to-configuration-axiom :=
+		let{
+			state_x := (getsx st);
+			state_y := (getsy st);
+			state_z := (getsz st);
+			state_vz := (getvz st)
+		}(fun
+			[
+				(state-to-configuration st vg h t) =
+				(config state_x state_y state_z vg h state_vz t)
+			]
+		)
+
+}#module state

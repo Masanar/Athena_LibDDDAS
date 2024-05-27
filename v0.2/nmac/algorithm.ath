@@ -3,13 +3,13 @@ load "lib/main/nat-minus"
 load "lib/main/nat-less"
 load "base/vector_2d"
 load "base/types"
-load "flightplan"
 load "base/matrix"
 load "base/v-list"
 load "base/nmac"
+load "flightplan"
 
 # @moduledoc
-# This module extends the NMAC principally with the solve function whichis used to solve
+# This module extends the NMAC principally with the solve function which is used to solve
 # the NMAC problem, i.e. to assign airspeeds to intervals. Additionally, it defines the
 # predicates check-safety and valid which are used in the solve function.
 # - check-safety: checks if a flightplan is safe with respect to a list of flightplans
@@ -70,14 +70,14 @@ extend-module NMAC{
       possible := (check-safety (Matrix.set board (Matrix.unassigned board) (V-list.get-index v_list v)) fa f_list v_list D H);
       future := (solve (Matrix.set board (Matrix.unassigned board) (V-list.get-index v_list v)) num_v num_intervals fa f_list v_list D H)
       }
-  (fun
-    [(valid v board num_v num_intervals fa f_list v_list D H) =
-      [ 
-        true  when (possible & ~(future = nilM))
-        false when (~(possible & ~(future = nilM)))
+    (fun
+      [(valid v board num_v num_intervals fa f_list v_list D H) =
+        [ 
+          true  when (possible & ~(future = nilM))
+          false when (~(possible & ~(future = nilM)))
+        ]
       ]
-    ]
-  ) 
+    ) 
   define [valid-true valid-false] := valid-axioms
   #---------------------------------------------------------------------------
 
