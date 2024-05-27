@@ -1,8 +1,8 @@
+load "types"
+load "vector_2d"
 load "lib/main/nat-plus"
 load "lib/main/nat-minus"
 load "lib/main/nat-less"
-load "vector_2d"
-load "types"
 
 
 # @moduledoc

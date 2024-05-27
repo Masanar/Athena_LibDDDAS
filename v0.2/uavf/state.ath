@@ -1,8 +1,8 @@
+load "types"
+load "vector_2d"
 load "lib/main/nat-plus"
 load "lib/main/nat-minus"
 load "lib/main/nat-less"
-load "vector_2d"
-load "types"
 
 #datatype State := (state sxy:Vector_2d sz:Real vxy:Vector_2d vz:Real t:Real)
 # @moduledoc
@@ -40,8 +40,8 @@ module State{
 	declare getvz : [State] -> Real
 	assert* getvz-axion := ( (getvz (state sx sy sz vx vy vz)) = vz)
 
-	declare state-to-configuration : [State Real Real Real] -> Configuration
-	assert state-to-configuration-axiom :=
+	declare to-configuration : [State Real Real Real] -> Configuration
+	assert to-configuration-axiom :=
 		let{
 			state_x := (getsx st);
 			state_y := (getsy st);
@@ -49,7 +49,7 @@ module State{
 			state_vz := (getvz st)
 		}(fun
 			[
-				(state-to-configuration st vg h t) =
+				(to-configuration st vg h t) =
 				(config state_x state_y state_z vg h state_vz t)
 			]
 		)
