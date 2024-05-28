@@ -2,21 +2,22 @@ load "configuration"
 module Motion{
     define [cfg_i cfg_i+1] := [?cfg_i: Configuration ?cfg_i+1: Configuration]
 
-    declare check-motion-linear: [Configuration Configuration] -> Boolean
+    declare check-linear: [Configuration Configuration] -> Boolean
 
-    assert check-motion-axioms := 
+    assert 
+     check-axioms := 
         let{
-            cfg_i_h := (Configuration.geth cfg_i);
+            cfg_i_h   := (Configuration.geth cfg_i);
             cfg_i+1_h := (Configuration.geth cfg_i+1);
-            linear := (cfg_i_h = cfg_i+1_h)
+            linear    := (cfg_i_h = cfg_i+1_h)
         }
         (fun
-            [(check-motion-linear cfg_i cfg_i+1) =
-            [ 
-                true when linear 
-                false when (~ linear)
-            ]
+            [(check-linear cfg_i cfg_i+1) =
+                [ 
+                    true when linear 
+                    false when (~ linear)
+                ]
             ]
         )
-    define [check-motion-linear-true check-motion-linear-false] := check-motion-axioms
+    define [check-linear-true check-linear-false] := check-axioms
 }

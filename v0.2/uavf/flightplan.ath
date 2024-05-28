@@ -1,0 +1,51 @@
+load "types"
+
+
+module Flightplan{
+
+    define [cfg flp flp_i] := [?cfg:Configuration ?flp:Flightplan ?flp_i:Flightplan]
+
+    declare empty-flightplan : [Flightplan]-> Boolean
+    assert* empty-flightplan-true  := ((empty-flightplan nilF) = false)
+    assert* empty-flightplan-false := ((empty-flightplan (consF cfg flp)) = true)
+
+    declare next-configuration : [Flightplan]-> Configuration 
+    assert next-configuration-axiom :=
+        (fun
+            [(next-configuration (consF cfg flp)) =
+                [
+                    cfg  when (~ empty-flightplan flp)
+                    nilC when (empty-flightplan flp)
+                ]
+            ]
+        )
+    
+    declare next-flightplan : [Flightplan]-> Flightplan
+    assert next-flightplan-axiom :=
+        (fun
+            [(next-flightplan (consF cfg flp)) =
+                [
+                    flp when (~ empty-flightplan flp)
+                    nilF when (empty-flightplan flp)
+                ]
+            ]
+        )
+
+    declare add-configuration : [Configuration Flightplan]-> Flightplan
+    assert* add-configuration-axiom := ((add-configuration cfg flp) = (consF cfg flp))
+        
+
+
+    #****************************************************************************
+    #-- membership operator in-Flightplan
+    # declare in-Flightplan : (Configuration) [Configuration Flightplan]-> Boolean
+    # assert* empty-Flightplan :=
+    #     (~ (in-Flightplan ?x:Configuration nilF))
+    # assert* nonempty-Flightplan :=
+    #     (
+    #     (in-Flightplan ?x:Configuration (consF ?h:Configuration ?t:Flightplan)) 
+    #     <==>
+    #     ?x:Configuration = ?h:Configuration | (in-Flightplan ?x:Configuration ?tail:Flightplan) 
+    #     )
+    #---------------------------------------------------------------------------
+}

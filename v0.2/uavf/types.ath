@@ -2,6 +2,8 @@ load "lib/main/nat-plus"
 load "lib/main/nat-minus"
 load "lib/main/nat-less"
 
+datatype Wing := L | R
+
 #****************************************************************************
 #-- 2D vectors 
 datatype Vector_2d 
@@ -21,7 +23,7 @@ assert* (datatype-axioms "Vector_2d")
 # vz: R is the vertical speed of the aircraft
 # t: is the time at which the configuration is 'recorded'
 datatype Configuration 
-         := (config sx:Real sy:Real sz:Real vg:Real h:Real vz:Real t:Real)
+         := nilC | (config sx:Real sy:Real sz:Real vg:Real h:Real vz:Real t:Real)
 
 #!!! The below line makes the code slow and take forever
 # assert* (datatype-axioms "Configuration")

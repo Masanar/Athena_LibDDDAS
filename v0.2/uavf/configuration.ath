@@ -18,29 +18,48 @@ module Configuration{
 	declare getsx: [Configuration] -> Real
 	assert* getsx-axiom :=
 	((getsx (config sxa sya sza vga ha vza t)) = sxa)
+	assert* getsx-axiom-empty := ((getsx (nilC)) = 0)
 
 	declare getsy: [Configuration] -> Real
 	assert* getsy-axiom :=
 	((getsy (config sxa sya sza vga ha vza t)) = sya)
+	assert* getsy-axiom-empty := ((getsy (nilC)) = 0)
 
 	declare getsz: [Configuration] -> Real
 	assert* getsz-axiom :=
 	((getsz (config sxa sya sza vga ha vza t)) = sza)
+	assert* getsz-axiom-empty := ((getsz (nilC)) = 0)
 
 	declare getvg: [Configuration] -> Real
 	assert* getvg-axiom :=
 	((getvg (config sxa sya sza vga ha vza t)) = vga)
+	assert* getvg-axiom-empty := ((getvg (nilC)) = 0)
 
 	declare geth: [Configuration] -> Real
 	assert* geth-axiom :=
 	((geth (config sxa sya sza vga ha vza t)) = ha)
+	assert* geth-axiom-empty := ((geth (nilC)) = 0)
 
 	declare getvz: [Configuration] -> Real
 	assert* getvz-axiom :=
 	((getvz (config sxa sya sza vga ha vza t)) = vza)
+	assert* getvz-axiom-empty := ((getvz (nilC)) = 0)
 
 	declare gettime: [Configuration] -> Real
 	assert* gettime-axiom :=
 	((gettime (config sxa sya sza vga ha vza t)) = t)
+	assert* gettime-axiom-empty := ((gettime (nilC)) = 0)
+
+	declare is-empty: [Configuration] -> Boolean
+	assert* is-empty-axiom-false :=
+	((is-empty (config sxa sya sza vga ha vza t)) = false)
+	assert* is-empty-axiom-true := ((is-empty nilC) = true)
+
+	declare to-state: [Configuration] -> State
+	assert* to-state-axiom :=
+		(
+			(to-state (config sxa sya sza vga ha vza t)) 
+				= (state sxa sya sza 0 0 vza)
+		)
 
 }#module state

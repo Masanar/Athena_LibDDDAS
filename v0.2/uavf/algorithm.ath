@@ -1,19 +1,39 @@
+load "motion"
 load "position"
-module UAVVF{
-    # The first is the local Leader FP and the second is empty and will carry the calculation
-    declare solve: [Flightplan Flightplan] -> Flightplan
-    # assert solve-axioms := 
-    # (fun
-    #     [(solve c1 c2 fp) =
-    #         [
-    #         #  add the linear configuration to the flightplan and recursively call solve
-    #         #  to add the circular information to the flightplan
-    #            when CircularMotionFirst 
+load "flightplan"
 
-    #         # return the adjusted (x,y,z) position same angle, velocities and time  
-    #         # singleton Flightplan
-    #           when LinearMotion
-    #         ]
-    #     ] 
-    # )
+module UAVVF{
+    define [nr wa] := [?nr: Real ?wa: Real]
+
+    define [lw rw w] := [?lw: Wing ?rw: Wing ?w: Wing]
+
+    define [flp_l flp_j flp_acc] := [?flp_l: Flightplan ?flp_j: Flightplan ?flp_acc: Flightplan]
+
+    # The first is the local Leader FP and the second is empty and will carry the calculation
+    declare solve-individual-agent: [Flightplan Flightplan Real Real Wing] -> Flightplan
+    assert solve-individual-agent-axioms := 
+    let{
+        next_cfg      := (Flightplan.next-configuration flp_l);
+        next_flp      := (Flightplan.next-flightplan flp_l);
+        next_next_cfg := (Flightplan.next-configuration next_flp);
+        not_empty_cfg := (~ Configuration.is-empty next_cfg);
+        linear-motion := (Motion.check-linear next_cfg next_next_cfg)
+    }
+    (fun
+        [(solve-individual-agent flp_l flp_acc wa nr w) =
+            # TODO: recursive call
+            [
+                (
+                    Flightplan.add-configuration 
+                        (Position.follower next_cfg wa nr w) 
+                        flp_acc
+                )
+                    when (linear-motion & not_empty_cfg)
+                nilF
+                    when ( (~ linear-motion) & not_empty_cfg)
+                flp_acc 
+                    when (~ not_empty_cfg)
+            ]
+        ] 
+    )
 }

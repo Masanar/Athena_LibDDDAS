@@ -4,9 +4,9 @@ load "configuration"
 
 module Position{
     define 
-    [lwa rwa ha nr haf has alpha t Rfs sx sy sz vx vy vz sxi syi szi vxi vyi vzi st st_i] := 
+    [wa w lwa rwa ha nr haf has alpha t Rfs sx sy sz vx vy vz sxi syi szi vxi vyi vzi st st_i] := 
         [
-            ?lwa: Real ?rwa: Real ?ha: Real ?nr: Real ?haf: Real ?has: Real 
+            ?wa: Real ?w:Wing ?lwa: Real ?rwa: Real ?ha: Real ?nr: Real ?haf: Real ?has: Real 
             ?alpha: Real ?t: Real ?Rfs: Real
             ?sx: Real ?sy: Real ?sz: Real ?vx: Real ?vy: Real ?vz: Real 
             ?sxi: Real ?syi: Real ?szi: Real ?vxi: Real ?vyi: Real ?vzi: Real
@@ -17,13 +17,13 @@ module Position{
 
     define [state_l state_f] := [?state_l: State ?state_f: State]
 
-    declare position-left-follower: [State Real Real Real] -> State 
-
-    declare position-right-follower: [State Real Real Real] -> State 
 
     declare zero-velocity-state: [Real Real Real] -> State
-    assert* zero-velocity-state-axiom := ((zero-velocity-state sx sy sz) = (state sx sy sz 0 0 0))
+    assert* zero-velocity-state-axiom := 
+        ((zero-velocity-state sx sy sz) = (state sx sy sz 0 0 0))
 
+    declare position-left-follower: [State Real Real Real] -> State 
+    declare position-right-follower: [State Real Real Real] -> State 
     assert position-follower-axiom :=
         let{
             cos_left  := (Real.cos lwa + ha);
@@ -43,6 +43,40 @@ module Position{
                     (zero-velocity-state (st_x + nr * cos_right) (st_y + nr * sin_right) st_z)    
             ]
         )
+
+
+
+    declare follower : [Configuration Real Real Wing] -> Configuration
+    assert follower-axiom := 
+        let{
+            state_c := (Configuration.to-state cfg_i);
+            config_h := (Configuration.geth cfg_i);
+            config_t := (Configuration.gettime cfg_i);
+            config_vg := (Configuration.getvg cfg_i)
+        }(fun
+            [
+                (follower cfg_i wa nr w) = 
+                    [
+                        (
+                            State.to-configuration 
+                                (position-left-follower state_c wa config_h nr) 
+                                config_vg 
+                                config_h 
+                                config_t
+                        ) 
+                            when (w = L)
+                        (
+                            State.to-configuration 
+                                (position-right-follower state_c wa config_h nr) 
+                                config_vg 
+                                config_h 
+                                config_t
+                        ) 
+                            when (w = R)
+                    ]
+            ]
+        )
+    
 
     declare angle-motion : [Real Real] -> Real
     assert angle-motion-axiom := ((angle-motion haf has) = (haf - has))
