@@ -4,9 +4,9 @@ load "configuration"
 
 module Position{
     define 
-    [wa w lwa rwa ha nr haf has alpha t Rfs sx sy sz vx vy vz sxi syi szi vxi vyi vzi st st_i] := 
+    [wa w lwa rwa ha nr hae has alpha t Rfs sx sy sz vx vy vz sxi syi szi vxi vyi vzi st st_i] := 
         [
-            ?wa: Real ?w:Wing ?lwa: Real ?rwa: Real ?ha: Real ?nr: Real ?haf: Real ?has: Real 
+            ?wa: Real ?w:Wing ?lwa: Real ?rwa: Real ?ha: Real ?nr: Real ?hae: Real ?has: Real 
             ?alpha: Real ?t: Real ?Rfs: Real
             ?sx: Real ?sy: Real ?sz: Real ?vx: Real ?vy: Real ?vz: Real 
             ?sxi: Real ?syi: Real ?szi: Real ?vxi: Real ?vyi: Real ?vzi: Real
@@ -57,6 +57,8 @@ module Position{
             [
                 (follower cfg_i wa nr w) = 
                     [
+                        nilC 
+                            when (Configuration.is-empty cfg_i)
                         (
                             State.to-configuration 
                                 (position-left-follower state_c wa config_h nr) 
@@ -79,27 +81,36 @@ module Position{
     
 
     declare angle-motion : [Real Real] -> Real
-    assert angle-motion-axiom := ((angle-motion haf has) = (haf - has))
+    assert angle-motion-axiom := ((angle-motion hae has) = (hae - has))
 
-    declare common-center : [State State] -> State
+    # TODO: Implement the common-center-distance function to return not the postion but
+    # the distance between the two states
+    declare common-center-distance : [Configuration Configuration] -> Real
     assert common-center-axiom := 
         let{
-            sti_x := (State.getsx st_i);
-            sti_y := (State.getsy st_i);
-            st_x  := (State.getsx st);
-            st_y  := (State.getsy st);
-            st_z  := (State.getsz st);
-            ccx := ((st_x + sti_x) / 2); 
-            ccy := ((st_y + sti_y) / 2)
+            st_x  := (Configuration.getsx cfg_i);
+            st_y  := (Configuration.getsy cfg_i);
+            sti_x := (Configuration.getsx cfg_i+1);
+            sti_y := (Configuration.getsy cfg_i+1);
+            x_diff := ((st_x - sti_x) * (st_x - sti_x));
+            y_diff := ((st_y - sti_y) * (st_y - sti_y));
+            distance := ((Real.sqrt (x_diff + y_diff)) / 2);
+            cfg_empty := (Configuration.is-empty cfg_i);
+            cfg_i+1_empty := (Configuration.is-empty cfg_i+1);
+            empty := (cfg_empty & cfg_i+1_empty)
         }
         (fun
             [
-                (common-center st st_i) = (zero-velocity-state ccx ccy st_z)
+                (common-center-distance cfg_i cfg_i+1) =  
+                [
+                    0.0 when empty
+                    distance when (~ empty)
+                ]
             ]
         )
 
     declare follower-velocity : [Real Real Real] -> Real
     assert follower-velocity-axiom := 
-        ((follower-velocity Rfs alpha t) = (Rfs * alpha / t))
+        ((follower-velocity Rfs alpha t) = ((Rfs * alpha) / t))
 
 }

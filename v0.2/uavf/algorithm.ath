@@ -12,28 +12,44 @@ module UAVVF{
     # The first is the local Leader FP and the second is empty and will carry the calculation
     declare solve-individual-agent: [Flightplan Flightplan Real Real Wing] -> Flightplan
     assert solve-individual-agent-axioms := 
-    let{
-        next_cfg      := (Flightplan.next-configuration flp_l);
-        next_flp      := (Flightplan.next-flightplan flp_l);
-        next_next_cfg := (Flightplan.next-configuration next_flp);
-        not_empty_cfg := (~ Configuration.is-empty next_cfg);
-        linear-motion := (Motion.check-linear next_cfg next_next_cfg)
-    }
-    (fun
-        [(solve-individual-agent flp_l flp_acc wa nr w) =
-            # TODO: recursive call
-            [
-                (
-                    Flightplan.add-configuration 
-                        (Position.follower next_cfg wa nr w) 
-                        flp_acc
-                )
-                    when (linear-motion & not_empty_cfg)
-                nilF
-                    when ( (~ linear-motion) & not_empty_cfg)
-                flp_acc 
-                    when (~ not_empty_cfg)
-            ]
-        ] 
-    )
+        let{
+            next_flp             := (Flightplan.next-flightplan flp_l);
+            next_cfg             := (Flightplan.next-configuration next_flp);
+            current_cfg          := (Flightplan.next-configuration flp_l);
+            linear_motion        := (Motion.check-linear current_cfg next_cfg);
+            not_empty_cfg        := (~ Configuration.is-empty current_cfg);
+            not_empty_next_cfg   := (~ Configuration.is-empty next_cfg);
+            future_follower_cfg  := (Position.follower next_cfg wa nr w);
+            current_follower_cfg := (Position.follower current_cfg wa nr w) 
+        }
+        (fun
+            [(solve-individual-agent flp_l flp_acc wa nr w) =
+                [
+                    (
+                        solve-individual-agent 
+                            next_flp
+                            (
+                                Flightplan.add-configuration 
+                                    current_follower_cfg 
+                                    flp_acc
+                            )
+                            wa nr w
+                    )
+                        when (linear_motion & not_empty_cfg)
+                    (
+                        solve-individual-agent 
+                            next_flp
+                            (
+                                Flightplan.add-configuration 
+                                    (Motion.circular current_cfg next_cfg)
+                                    flp_acc
+                            )
+                            wa nr w
+                    )
+                        when ( (~ linear_motion) & not_empty_cfg & not_empty_next_cfg)
+                    flp_acc 
+                        when (~ not_empty_cfg)
+                ]
+            ] 
+        )
 }

@@ -9,8 +9,8 @@ load "lib/main/nat-less"
 # This module defines the Configuration getters for its attributes
 module Configuration{
 	#****************************************************************************
-	define [sxa sya sza vga ha vza t]:=
-	[?sxa:Real ?sya:Real ?sza:Real ?vga:Real ?ha:Real ?vza:Real ?t:Real]
+	define [sxa sya sza vga ha vza t newvg]:=
+	[?sxa:Real ?sya:Real ?sza:Real ?vga:Real ?ha:Real ?vza:Real ?t:Real ?newvg:Real]
 
 	#****************************************************************************
 	# Definition of getters fot Configuration datatype
@@ -60,6 +60,12 @@ module Configuration{
 		(
 			(to-state (config sxa sya sza vga ha vza t)) 
 				= (state sxa sya sza 0 0 vza)
+		)
+	declare change-vg: [Configuration Real] -> Configuration
+	assert* change-vg-axiom :=
+		(
+			(change-vg (config sxa sya sza vga ha vza t) newvg)
+				= (config sxa sya sza newvg ha vza t)
 		)
 
 }#module state

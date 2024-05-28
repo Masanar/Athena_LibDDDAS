@@ -1,18 +1,19 @@
+load "position"
 load "configuration"
 module Motion{
-    define [cfg_i cfg_i+1] := [?cfg_i: Configuration ?cfg_i+1: Configuration]
+    define [cfg_s cfg_e] := [?cfg_s: Configuration ?cfg_e: Configuration]
 
     declare check-linear: [Configuration Configuration] -> Boolean
 
     assert 
      check-axioms := 
         let{
-            cfg_i_h   := (Configuration.geth cfg_i);
-            cfg_i+1_h := (Configuration.geth cfg_i+1);
-            linear    := (cfg_i_h = cfg_i+1_h)
+            cfg_s_h   := (Configuration.geth cfg_s);
+            cfg_e_h := (Configuration.geth cfg_e);
+            linear    := (cfg_s_h = cfg_e_h)
         }
         (fun
-            [(check-linear cfg_i cfg_i+1) =
+            [(check-linear cfg_s cfg_e) =
                 [ 
                     true when linear 
                     false when (~ linear)
@@ -20,4 +21,21 @@ module Motion{
             ]
         )
     define [check-linear-true check-linear-false] := check-axioms
+
+    declare circular: [Configuration Configuration] -> Configuration 
+    assert circular-axiom :=
+        let{
+            cfg_s_h  := (Configuration.geth cfg_s);
+            cfg_e_h  := (Configuration.geth cfg_e);
+            cfg_e_t  := (Configuration.gettime cfg_e);
+            cfg_s_t  := (Configuration.gettime cfg_s);
+            delta_t  := (cfg_e_t - cfg_s_t);
+            alpha    := (Position.angle-motion cfg_e_h cfg_s_h);
+            rfs      := (Position.common-center-distance cfg_s cfg_e);
+            velocity := (Position.follower-velocity rfs alpha delta_t)
+        }(fun
+            [
+                (circular cfg_s cfg_e) = (Configuration.change-vg cfg_s velocity)
+            ]
+        )
 }
