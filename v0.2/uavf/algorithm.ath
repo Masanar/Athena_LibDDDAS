@@ -9,7 +9,7 @@ module UAVVF{
 
     define [flp_l flp_j flp_acc] := [?flp_l: Flightplan ?flp_j: Flightplan ?flp_acc: Flightplan]
 
-    # The first is the local Leader FP and the second is empty and will carry the calculation
+    # TODO there is a & that should be an |
     declare solve-individual-agent: [Flightplan Flightplan Real Real Wing] -> Flightplan
     assert solve-individual-agent-axioms := 
         let{

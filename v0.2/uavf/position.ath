@@ -97,7 +97,7 @@ module Position{
             distance := ((Real.sqrt (x_diff + y_diff)) / 2);
             cfg_empty := (Configuration.is-empty cfg_i);
             cfg_i+1_empty := (Configuration.is-empty cfg_i+1);
-            empty := (cfg_empty & cfg_i+1_empty)
+            empty := (cfg_empty | cfg_i+1_empty)
         }
         (fun
             [
